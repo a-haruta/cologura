@@ -5,6 +5,7 @@
     "lib": ["esnext", "dom"],
     "strict": true,
     "esModuleInterop": true,
-    "moduleResolution": "nodenext"
+    "moduleResolution": "nodenext",
+    "types": ["@webgpu/types"],
   }
 }
