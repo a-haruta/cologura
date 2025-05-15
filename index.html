@@ -2,14 +2,18 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>TypeScript ESM Test</title>
+  <title>TypeScript ESM WebGPU Test</title>
 </head>
 <body>
-  <h1>TypeScript ESM バンドルテスト</h1>
-  <div id="result"></div>
+  <h1>WebGPU デバイス情報</h1>
+  <div id="gpu-info">取得中...</div>
   <script type="module">
-    import { add } from './main.js';
-    document.getElementById('result').innerText = `Add 2 + 3 = ${add(2, 3)}`;
+    import { getWebGPUInfo } from "./main.js";
+
+    document.addEventListener("DOMContentLoaded",async () =>
+    {
+      document.getElementById("gpu-info").innerText = await getWebGPUInfo();
+    });
   </script>
 </body>
 </html>
