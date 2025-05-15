@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>TypeScript ESM Test</title>
+</head>
+<body>
+  <h1>TypeScript ESM バンドルテスト</h1>
+  <div id="result"></div>
+  <script type="module">
+    import { add } from './main.js';
+    document.getElementById('result').innerText = `Add 2 + 3 = ${add(2, 3)}`;
+  </script>
+</body>
+</html>
