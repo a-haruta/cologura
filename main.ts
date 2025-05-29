@@ -55,7 +55,18 @@ export async function clearCanvasBlue(canvas: HTMLCanvasElement): Promise<void> 
             targets: [{ format: navigator.gpu.getPreferredCanvasFormat() }],
         },
         primitive: { topology: 'triangle-list' },
-        depthStencil: undefined,
+        depthStencil: {
+            format: 'depth24plus',
+            depthWriteEnabled: true,
+            depthCompare: 'less',
+        },
+    });
+
+    // 深度バッファ用テクスチャを作成
+    const depthTexture = device.createTexture({
+        size: [canvas.width, canvas.height],
+        format: 'depth24plus',
+        usage: GPUTextureUsage.RENDER_ATTACHMENT,
     });
 
     let t = 0;
@@ -74,6 +85,12 @@ export async function clearCanvasBlue(canvas: HTMLCanvasElement): Promise<void> 
                     storeOp: 'store',
                 },
             ],
+            depthStencilAttachment: {
+                view: depthTexture.createView(),
+                depthClearValue: 1.0,
+                depthLoadOp: 'clear',
+                depthStoreOp: 'store',
+            },
         });
         renderPass.setPipeline(pipeline);
         renderPass.setBindGroup(0, matrices.bindGroup);
