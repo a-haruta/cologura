@@ -1,24 +1,5 @@
 import { float2, float3, float4 } from "./math";
-
-export class Vertex {
-    constructor(
-        public position: float3,
-        public normal: float3,
-        public tangent: float3,
-        public color: float4,
-        public uv: float2
-    ) {}
-    static default() {
-        return new Vertex(float3.zero(), float3.zero(), float3.zero(), new float4(1,1,1,1), float2.zero());
-    }
-    static readonly stride : number = 3 + 3 + 3 + 4 + 2; // pos(3)+normal(3)+tangent(3)+color(4)+uv(2)
-}
-export class ObjMesh {
-    constructor(
-        public vertices: Vertex[],
-        public indices: number[]
-    ) {}
-}
+import { ObjMesh, Vertex } from "./mesh";
 
 export async function loadObjMesh(url: string): Promise<ObjMesh> {
     const text = await fetch(url).then(r => r.text());

@@ -1,6 +1,5 @@
-import { float2, float3, float4 } from './math';
-import { loadObjMesh, Vertex } from './obj';
-import { createWebGPUMeshBuffers } from './mesh';
+import { loadObjMesh, } from './obj';
+import { createWebGPUMeshBuffers, Vertex } from './mesh';
 import { Matrices } from './uniform';
 
 export async function getWebGPUInfo(): Promise<string> {
@@ -25,7 +24,6 @@ export async function clearCanvasBlue(canvas: HTMLCanvasElement): Promise<void> 
 
     const obj = await loadObjMesh('./box.obj');
     const mesh = createWebGPUMeshBuffers(device, obj);
-
     const matrices = new Matrices(device);
 
     const shaderWGSL = await fetch('./shader.wgsl').then(r => r.text());
@@ -39,13 +37,7 @@ export async function clearCanvasBlue(canvas: HTMLCanvasElement): Promise<void> 
             buffers: [
                 {
                     arrayStride: 4 * Vertex.stride,
-                    attributes: [
-                        { shaderLocation: 0, offset: 0,  format: 'float32x3' }, // position
-                        { shaderLocation: 1, offset: 12, format: 'float32x3' }, // normal
-                        { shaderLocation: 2, offset: 24, format: 'float32x3' }, // tangent
-                        { shaderLocation: 3, offset: 36, format: 'float32x4' }, // color
-                        { shaderLocation: 4, offset: 52, format: 'float32x2' }, // uv
-                    ],
+                    attributes: mesh.attributes,
                 },
             ],
         },

@@ -1,4 +1,3 @@
-
 export class Matrices {
     public readonly buffer: GPUBuffer;
     public readonly bindGroupLayout: GPUBindGroupLayout;
@@ -22,7 +21,7 @@ export class Matrices {
 
     public updateMatricesUniformBuffer(device: GPUDevice, t: number): void {
         device.queue.writeBuffer(this.buffer, 0, new Float32Array([
-            ...Matrices.makeModelMatrix(t),
+            ...Matrices.makeModelMatrix(t, [0.3, 1, 0]),
             ...Matrices.makeViewMatrix(),
             ...Matrices.makePerspectiveMatrix(Math.PI / 3, 1.0, 0.1, 100.0),
         ]));
@@ -47,14 +46,21 @@ export class Matrices {
             0,0,-4,1
         ]);
     }
-    static makeModelMatrix(t: number): Float32Array {
+    static makeModelMatrix(t: number, axis: [number, number, number] = [0, 1, 0]): Float32Array {
+        const [x, y, z] = axis;
+        const len = Math.sqrt(x * x + y * y + z * z);
+        const nx = x / (len || 1);
+        const ny = y / (len || 1);
+        const nz = z / (len || 1);
         const c = Math.cos(t);
         const s = Math.sin(t);
+        const ic = 1 - c;
+        // Rodrigues' rotation formula
         return new Float32Array([
-            c,0,s,0,
-            0,1,0,0,
-            -s,0,c,0,
-            0,0,0,1
+            c + nx*nx*ic,     nx*ny*ic - nz*s, nx*nz*ic + ny*s, 0,
+            ny*nx*ic + nz*s,  c + ny*ny*ic,    ny*nz*ic - nx*s, 0,
+            nz*nx*ic - ny*s,  nz*ny*ic + nx*s, c + nz*nz*ic,    0,
+            0,                0,               0,               1
         ]);
     }
 }
