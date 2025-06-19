@@ -1,5 +1,5 @@
 import { loadObjMesh, } from './obj';
-import { createWebGPUMeshBuffers, Vertex } from './mesh';
+import { createWebGPUMeshBuffers, Texture, Vertex } from './mesh';
 import { Matrices } from './uniform';
 
 export async function getWebGPUInfo(): Promise<string> {
@@ -25,11 +25,12 @@ export async function clearCanvasBlue(canvas: HTMLCanvasElement): Promise<void> 
     const obj = await loadObjMesh('./box.obj');
     const mesh = createWebGPUMeshBuffers(device, obj);
     const matrices = new Matrices(device);
+    const texture = await Texture.create(device, './cologra_burger_notm.webp');
 
     const shaderWGSL = await fetch('./shader.wgsl').then(r => r.text());
     const pipeline = await device.createRenderPipelineAsync({
         layout: device.createPipelineLayout({
-            bindGroupLayouts: [matrices.bindGroupLayout],
+            bindGroupLayouts: [matrices.bindGroupLayout, texture.textureBindGroupLayout],
         }),
         vertex: {
             module: device.createShaderModule({ code: shaderWGSL }),
@@ -86,6 +87,7 @@ export async function clearCanvasBlue(canvas: HTMLCanvasElement): Promise<void> 
         });
         renderPass.setPipeline(pipeline);
         renderPass.setBindGroup(0, matrices.bindGroup);
+        renderPass.setBindGroup(1, texture.textureBindGroup);
         renderPass.setVertexBuffer(0, mesh.vertexBuffer);
         renderPass.setIndexBuffer(mesh.indexBuffer, 'uint32');
         renderPass.drawIndexed(mesh.indexCount);

@@ -2,7 +2,7 @@ import { float2, float3, float4 } from "./math";
 import { ObjMesh, Vertex } from "./mesh";
 
 export async function loadObjMesh(url: string): Promise<ObjMesh> {
-    const text = await fetch(url).then(r => r.text());
+    const text = await (await fetch(url)).text()
     const lines = text.split(/\r?\n/);
     const pos: float3[] = [];
     const nor: float3[] = [];
