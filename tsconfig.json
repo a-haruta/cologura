@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "module": "nodenext",
+    "module": "esnext",
     "lib": ["esnext", "dom"],
     "strict": true,
     "esModuleInterop": true,
-    "moduleResolution": "nodenext",
-    "types": ["@webgpu/types"],
+    "moduleResolution": "bundler",
+    "types": ["@webgpu/types"]
   }
 }
