@@ -47,8 +47,8 @@ export async function loadObjMesh(url: string): Promise<ObjMesh> {
         vertices.push(new Vertex(
             pos[faces[i].v] || new float3(0, 0, 0),
             nor[faces[i].vn] || new float3(0, 0, 1),
-            tangent[i] || new float3(0, 0, 0),
-            color[i] || new float4(1, 1, 1, 1),
+            tangent[faces[i].v] || new float3(0, 0, 0),
+            color[faces[i].v] || new float4(1, 1, 1, 1),
             uv[faces[i].vt] || new float2(0, 0),
         ));
         indices.push(i);
