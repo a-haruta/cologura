@@ -28,9 +28,9 @@ export async function clearCanvasBlue(canvas: HTMLCanvasElement): Promise<void> 
     const texture = new Texture(device, await TextureSource.load('./cologra_burger_notm.webp'));
 
     const shaderModule = device.createShaderModule({ code: await fetch('./shader.wgsl').then(r => r.text()) });
-    const pipeline = await device.createRenderPipelineAsync({
+    const pipeline = await device.createRenderPipelineAsync({ // PSO的なやつ
         layout: device.createPipelineLayout({
-            bindGroupLayouts: [matrices.bindGroupLayout, texture.textureBindGroupLayout],
+            bindGroupLayouts: [matrices.bindGroupLayout, texture.textureBindGroupLayout], // ルートシグネチャ的なやつ？
         }),
         vertex: {
             module: shaderModule,
