@@ -1,6 +1,6 @@
-import { loadObjMesh, } from './obj';
-import { createWebGPUMeshBuffers, Vertex } from './mesh';
-import { Texture } from "./Texture";
+import { ObjMeshSource, } from './obj';
+import { Mesh, Vertex } from './mesh';
+import { Texture, TextureSource } from "./Texture";
 import { Matrices } from './uniform';
 
 export async function getWebGPUInfo(): Promise<string> {
@@ -23,18 +23,17 @@ export async function clearCanvasBlue(canvas: HTMLCanvasElement): Promise<void> 
         format: navigator.gpu.getPreferredCanvasFormat(),
     });
 
-    const obj = await loadObjMesh('./box.obj');
-    const mesh = createWebGPUMeshBuffers(device, obj);
+    const mesh = new Mesh(device, await ObjMeshSource.load('./box.obj'));
     const matrices = new Matrices(device);
-    const texture = await Texture.create(device, './cologra_burger_notm.webp');
+    const texture = new Texture(device, await TextureSource.load('./cologra_burger_notm.webp'));
 
-    const shaderWGSL = await fetch('./shader.wgsl').then(r => r.text());
+    const shaderModule = device.createShaderModule({ code: await fetch('./shader.wgsl').then(r => r.text()) });
     const pipeline = await device.createRenderPipelineAsync({
         layout: device.createPipelineLayout({
             bindGroupLayouts: [matrices.bindGroupLayout, texture.textureBindGroupLayout],
         }),
         vertex: {
-            module: device.createShaderModule({ code: shaderWGSL }),
+            module: shaderModule,
             entryPoint: 'main_VS',
             buffers: [
                 {
@@ -44,7 +43,7 @@ export async function clearCanvasBlue(canvas: HTMLCanvasElement): Promise<void> 
             ],
         },
         fragment: {
-            module: device.createShaderModule({ code: shaderWGSL }),
+            module: shaderModule,
             entryPoint: 'main_FS',
             targets: [{ format: navigator.gpu.getPreferredCanvasFormat() }],
         },

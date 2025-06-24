@@ -1,41 +1,48 @@
-
-export class Texture {
-    public static async create(device: GPUDevice, url: string): Promise<Texture> {
+export class TextureSource {
+    
+    public static async load(url: string): Promise<TextureSource> {
         const bin = await (await fetch(url)).arrayBuffer();
         const blob = new Blob([bin]);
         const imageBitmap = await createImageBitmap(blob);
-        const texture = device.createTexture({
-            size: [imageBitmap.width, imageBitmap.height, 1],
+        return new TextureSource(imageBitmap);
+    }
+
+    private constructor(public bitmap: ImageBitmap){ }
+}
+
+export class Texture {
+
+    public readonly texture: GPUTexture;
+    public readonly sampler: GPUSampler;
+    public readonly textureBindGroupLayout: GPUBindGroupLayout;
+    public readonly textureBindGroup: GPUBindGroup;
+
+    public constructor(device: GPUDevice, source: TextureSource)
+    {
+        this.texture = device.createTexture({
+            size: [source.bitmap.width, source.bitmap.height, 1],
             format: 'rgba8unorm',
             usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT,
         });
         device.queue.copyExternalImageToTexture(
-            { source: imageBitmap },
-            { texture: texture },
-            [imageBitmap.width, imageBitmap.height]
+            { source: source.bitmap },
+            { texture: this.texture },
+            [source.bitmap.width, source.bitmap.height]
         );
 
-        const sampler = device.createSampler();
-        const textureBindGroupLayout = device.createBindGroupLayout({
+        this.sampler = device.createSampler();
+        this.textureBindGroupLayout = device.createBindGroupLayout({
             entries: [
                 { binding: 0, visibility: GPUShaderStage.FRAGMENT, sampler: {} },
                 { binding: 1, visibility: GPUShaderStage.FRAGMENT, texture: {} },
             ],
         });
-        const textureBindGroup = device.createBindGroup({
-            layout: textureBindGroupLayout,
+        this.textureBindGroup = device.createBindGroup({
+            layout: this.textureBindGroupLayout,
             entries: [
-                { binding: 0, resource: sampler },
-                { binding: 1, resource: texture.createView() },
+                { binding: 0, resource: this.sampler },
+                { binding: 1, resource: this.texture.createView() },
             ],
         });
-
-        return new Texture(texture, sampler, textureBindGroupLayout, textureBindGroup);
     }
-
-    private constructor(
-        public texture: GPUTexture,
-        public sampler: GPUSampler,
-        public textureBindGroupLayout: GPUBindGroupLayout,
-        public textureBindGroup: GPUBindGroup) { }
 }
