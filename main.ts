@@ -1,5 +1,6 @@
 import { loadObjMesh, } from './obj';
-import { createWebGPUMeshBuffers, Texture, Vertex } from './mesh';
+import { createWebGPUMeshBuffers, Vertex } from './mesh';
+import { Texture } from "./Texture";
 import { Matrices } from './uniform';
 
 export async function getWebGPUInfo(): Promise<string> {
